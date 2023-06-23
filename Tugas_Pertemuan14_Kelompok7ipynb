@@ -1,0 +1,227 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/lauracantik/deep_learning/blob/main/Tugas_Pertemuan14_Kelompok7ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "GpQhlTGeffrJ"
+      },
+      "outputs": [],
+      "source": [
+        "# Import necessary libraries\n",
+        "import tensorflow as tf\n",
+        "from tensorflow.keras.datasets import mnist\n",
+        "from tensorflow.keras.models import Sequential\n",
+        "from tensorflow.keras.layers import Dense, Dropout, Flatten, BatchNormalization\n",
+        "from tensorflow.keras.layers import Conv2D, MaxPooling2D"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Load MNIST dataset\n",
+        "(x_train, y_train), (x_test, y_test) = mnist.load_data()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "GLzwVwgyfmkn",
+        "outputId": "2b7d9e2d-b509-45e2-ecab-503b99fce4d7"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz\n",
+            "11490434/11490434 [==============================] - 0s 0us/step\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Reshape data\n",
+        "x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)\n",
+        "x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)\n",
+        "input_shape = (28, 28, 1)"
+      ],
+      "metadata": {
+        "id": "q50ukMGZfpJa"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Normalize data\n",
+        "x_train = x_train.astype('float32')\n",
+        "x_test = x_test.astype('float32')\n",
+        "x_train /= 255\n",
+        "x_test /= 255"
+      ],
+      "metadata": {
+        "id": "Ot8AOjaTfsVW"
+      },
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Convert class vectors to binary class matrices\n",
+        "y_train = tf.keras.utils.to_categorical(y_train, 10)\n",
+        "y_test = tf.keras.utils.to_categorical(y_test, 10)"
+      ],
+      "metadata": {
+        "id": "wWM2z3U9fudx"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Define model\n",
+        "model = Sequential()\n",
+        "model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))\n",
+        "model.add(BatchNormalization())\n",
+        "model.add(Conv2D(64, (3, 3), activation='relu'))\n",
+        "model.add(BatchNormalization())\n",
+        "model.add(MaxPooling2D(pool_size=(2, 2)))\n",
+        "model.add(Dropout(0.25))\n",
+        "model.add(Flatten())\n",
+        "model.add(Dense(128, activation='relu'))\n",
+        "model.add(BatchNormalization())\n",
+        "model.add(Dropout(0.5))\n",
+        "model.add(Dense(10, activation='softmax'))"
+      ],
+      "metadata": {
+        "id": "3vPHoyLGfwf_"
+      },
+      "execution_count": 6,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Compile model\n",
+        "model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.Adadelta(), metrics=['accuracy'])"
+      ],
+      "metadata": {
+        "id": "XD4Dtue3fyUY"
+      },
+      "execution_count": 7,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Train model\n",
+        "model.fit(x_train, y_train, batch_size=128, epochs=10, verbose=1, validation_data=(x_test, y_test))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hnaY5Y3qf0Hf",
+        "outputId": "ab758126-2f6e-467a-ba4d-e3fcd1b99c8a"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Epoch 1/10\n",
+            "469/469 [==============================] - 234s 495ms/step - loss: 2.8069 - accuracy: 0.2187 - val_loss: 1.8117 - val_accuracy: 0.3041\n",
+            "Epoch 2/10\n",
+            "469/469 [==============================] - 230s 490ms/step - loss: 1.8319 - accuracy: 0.4333 - val_loss: 0.8553 - val_accuracy: 0.7565\n",
+            "Epoch 3/10\n",
+            "469/469 [==============================] - 230s 490ms/step - loss: 1.3511 - accuracy: 0.5745 - val_loss: 0.6147 - val_accuracy: 0.8313\n",
+            "Epoch 4/10\n",
+            "469/469 [==============================] - 232s 494ms/step - loss: 1.0687 - accuracy: 0.6604 - val_loss: 0.4905 - val_accuracy: 0.8628\n",
+            "Epoch 5/10\n",
+            "469/469 [==============================] - 231s 492ms/step - loss: 0.8940 - accuracy: 0.7164 - val_loss: 0.4153 - val_accuracy: 0.8830\n",
+            "Epoch 6/10\n",
+            "469/469 [==============================] - 230s 490ms/step - loss: 0.7803 - accuracy: 0.7548 - val_loss: 0.3660 - val_accuracy: 0.8953\n",
+            "Epoch 7/10\n",
+            "469/469 [==============================] - 233s 496ms/step - loss: 0.6959 - accuracy: 0.7812 - val_loss: 0.3304 - val_accuracy: 0.9049\n",
+            "Epoch 8/10\n",
+            "469/469 [==============================] - 230s 490ms/step - loss: 0.6288 - accuracy: 0.8028 - val_loss: 0.3043 - val_accuracy: 0.9125\n",
+            "Epoch 9/10\n",
+            "469/469 [==============================] - 232s 494ms/step - loss: 0.5768 - accuracy: 0.8214 - val_loss: 0.2833 - val_accuracy: 0.9176\n",
+            "Epoch 10/10\n",
+            "469/469 [==============================] - 231s 493ms/step - loss: 0.5398 - accuracy: 0.8327 - val_loss: 0.2668 - val_accuracy: 0.9226\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<keras.callbacks.History at 0x7f420d2aa260>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Evaluate model\n",
+        "score = model.evaluate(x_test, y_test, verbose=0)\n",
+        "print('Test loss:', score[0])\n",
+        "print('Test accuracy:', score[1])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "O6SeRjePf1_j",
+        "outputId": "d1185355-f759-4002-b487-5c25f55db9e0"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Test loss: 0.266794353723526\n",
+            "Test accuracy: 0.9225999712944031\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
